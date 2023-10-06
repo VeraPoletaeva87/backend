@@ -3,6 +3,8 @@ const expensesItems = require('./src/expenses.json');
 
 const path = require("path");
 
+const cache = [];
+
 const ExpensesService = require('./src/expensesService');
  
 const PORT = process.env.PORT || 3010;
@@ -17,7 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/expenses', (req, res) => {
-  res.json({ data: expensesItems });
+  cache.length ? res.json({ data: cache }) : res.json({ data: expensesItems });
 });
 
 app.post('/expenses', async (request, response, next) => {
@@ -27,6 +29,8 @@ app.post('/expenses', async (request, response, next) => {
     const expenses = await expensesService.getList();
     id = expenses.length;
    }
+
+   cache.push({id, date, category, sum, comment});
    await expensesService.addEntry({id, date, category, sum, comment});
   
   response.send('added');
