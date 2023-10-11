@@ -21,17 +21,24 @@ module.exports = class TaskService {
         return JSON.parse(data);
     }
 
-    async addEntry(purchase) {
+    async addItem(item) {
        const data = (await this.getData()) || [];
        const arr = Object.values(data);
-       arr.push(purchase);
+       arr.push(item);
        await writeFile(this.dataFile, JSON.stringify(arr));
        return true;
     }
 
-    async removeEntry(name) {
+    async editItem(item) {
+        let id = item.id;
         const data = (await this.getData()) || [];
-        const dataNew = data.filter(elem => elem.name != name);
-        return await writeFile(this.dataFile, JSON.stringify(dataNew));
+        const arr = Object.values(data);
+        arr[id] = item;
+        await writeFile(this.dataFile, JSON.stringify(arr));
+        return true;
+    }
+
+    async deleteItem(cache) {
+        return await writeFile(this.dataFile, JSON.stringify(cache));
     }
 }
