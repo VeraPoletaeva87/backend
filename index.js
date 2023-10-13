@@ -22,6 +22,12 @@ app.get('/expenses', (req, res) => {
   cache.length ? res.json({ data: cache }) : res.json({ data: expensesItems });
 });
 
+app.get('/api/statistics', async (req, res) => {
+  const expensesService = new ExpensesService(path.join(__dirname, './src/expenses.json'));
+  const statisticsData = await expensesService.getStatistics(req.query.periodType);
+  res.json({ data: statisticsData });
+});
+
 app.put('/expenses', async (request, response, next) => {
   const expensesService = new ExpensesService(path.join(__dirname, './src/expenses.json'));
   let { id, date, category, sum, comment } = request.body;

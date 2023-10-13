@@ -38,6 +38,36 @@ module.exports = class TaskService {
         return true;
     }
 
+    //returns categories and totals for 
+    async getStatistics(periodType) {
+        // const path = require("path");
+        // await writeFile(path.join(__dirname, './log.txt'), 'period' + periodType);
+        const currDate = new Date();
+        const currMonth = currDate.getMonth();
+        const prevDate = new Date();
+        prevDate.setMonth(currMonth - 1);
+
+        const data = await readFile(this.dataFile, 'utf-8');
+        const items = JSON.parse(data);
+
+        //get unique categories list
+        const categories = items.map(item => item.category);
+        var labels = [...new Set(categories)];
+
+        let totals = [];
+        
+        //calculate total sum for each category for period
+        labels.forEach(label => {
+           const total = items
+          .filter(item => item.category === label && (prevDate <= new Date(item.date) && new Date(item.date) <= currDate))
+          .map(cat => +cat.sum)
+          .reduce((acc, sum) => acc + sum, 0);
+          totals.push(total);
+          });   
+
+        return {labels, totals};
+    }
+
     async deleteItem(cache) {
         return await writeFile(this.dataFile, JSON.stringify(cache));
     }
